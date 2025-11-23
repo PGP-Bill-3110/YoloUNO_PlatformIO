@@ -1,4 +1,8 @@
 #include "task_wifi.h"
+#include "coreiot.h"
+#include "task_webserver.h"
+#include "global.h"
+#include "task_core_iot.h"
 
 void startAP()
 {
@@ -43,4 +47,26 @@ bool Wifi_reconnect()
     }
     startSTA();
     return false;
+}
+
+void task_wifi(void *pvParameters)
+{
+    // Kết nối lần đầu
+    startSTA();
+
+    for (;;)
+    {
+        if (!Wifi_reconnect())
+        {
+            Webserver_stop();
+        }
+        else
+        {
+            CORE_IOT_reconnect();
+        }
+
+        Webserver_reconnect();
+
+        vTaskDelay(1000); // chạy 1 lần mỗi giây
+    }
 }

@@ -5,9 +5,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
-
+#include <LiquidCrystal_I2C.h>
 extern float glob_temperature;
 extern float glob_humidity;
+
 
 extern String WIFI_SSID;
 extern String WIFI_PASS;
@@ -17,4 +18,8 @@ extern String CORE_IOT_PORT;
 
 extern boolean isWifiConnected;
 extern SemaphoreHandle_t xBinarySemaphoreInternet;
+extern SemaphoreHandle_t i2cMutex;
+
+extern LiquidCrystal_I2C lcd;
+
 #endif

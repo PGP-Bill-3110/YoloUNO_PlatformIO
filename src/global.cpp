@@ -10,7 +10,9 @@ String CORE_IOT_PORT;
 
 String ssid = "ESP32-YOUR NETWORK HERE!!!";
 String password = "12345678";
-String wifi_ssid = "abcde";
-String wifi_password = "123456789";
+String wifi_ssid = "1421E2_5G";
+String wifi_password = "phuc3110";
 boolean isWifiConnected = false;
 SemaphoreHandle_t xBinarySemaphoreInternet = xSemaphoreCreateBinary();
+LiquidCrystal_I2C lcd(33, 16, 2);
+SemaphoreHandle_t i2cMutex = NULL;
