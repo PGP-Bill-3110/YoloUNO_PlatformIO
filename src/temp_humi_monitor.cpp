@@ -1,25 +1,15 @@
 #include "temp_humi_monitor.h"
 #include "global.h"
 #include <Wire.h>
+#include "DHT20.h"
 
-DHT20 dht20;
+extern DHT20 dht20;
 extern LiquidCrystal_I2C lcd;
 extern SemaphoreHandle_t i2cMutex;
 extern float glob_temperature;
 extern float glob_humidity;
 
 void temp_humi_monitor(void *pvParameters) {
-
-    // Khởi tạo I2C
-    //Wire.begin(11, 12);
-    //Serial.begin(115200);
-
-    // Khởi tạo cảm biến DHT20
-    //dht20.begin();
-
-    // Khởi tạo LCD
-    //lcd.begin();
-    //lcd.backlight();
 
     while (true) {
         float temperature = -1;
@@ -49,17 +39,15 @@ void temp_humi_monitor(void *pvParameters) {
         if (xSemaphoreTake(i2cMutex, portMAX_DELAY)) {
             lcd.clear();
             lcd.setCursor(0, 0);
-            lcd.print("Hum: "); lcd.print(humidity, 1); lcd.print("%");
-            lcd.setCursor(0, 1);
-            lcd.print("Temp: "); lcd.print(temperature, 1); lcd.print(" C");
+            lcd.print("Hu:"); lcd.print(humidity,1); lcd.print("% T:");
+            lcd.print(temperature,1); lcd.print(" C");
             xSemaphoreGive(i2cMutex);
         }
 
-        // Hiển thị lên Serial (không cần semaphore)
+        // Serial output (không cần mutex)
         Serial.print("[TEMP_HUMI] Temp: "); Serial.print(temperature);
         Serial.print(" C  Hum: "); Serial.print(humidity); Serial.println("%");
 
-        // Delay giữa các lần đọc
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }

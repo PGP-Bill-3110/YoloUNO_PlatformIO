@@ -6,6 +6,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include <LiquidCrystal_I2C.h>
+#include "DHT20.h"
 extern float glob_temperature;
 extern float glob_humidity;
 
@@ -21,5 +22,11 @@ extern SemaphoreHandle_t xBinarySemaphoreInternet;
 extern SemaphoreHandle_t i2cMutex;
 
 extern LiquidCrystal_I2C lcd;
+
+extern DHT20 dht20;
+extern String ssid;
+extern String password; 
+extern String wifi_ssid;
+extern String wifi_password;
 
 #endif

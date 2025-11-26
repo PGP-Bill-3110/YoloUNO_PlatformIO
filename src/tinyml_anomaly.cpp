@@ -1,4 +1,12 @@
 #include "tinyml_anomaly.h"
+#include "global.h"
+#include <Adafruit_NeoPixel.h>
+
+extern LiquidCrystal_I2C lcd;
+extern float glob_temperature;
+extern float glob_humidity;
+extern SemaphoreHandle_t i2cMutex;
+extern DHT20 dht20;
 
 tflite::ErrorReporter* anomaly_error_reporter = nullptr;
 tflite::MicroInterpreter* anomaly_interpreter = nullptr;
@@ -7,12 +15,6 @@ TfLiteTensor* anomaly_output = nullptr;
 
 constexpr int ANOMALY_TENSOR_ARENA_SIZE = 8 * 1024;
 static uint8_t anomaly_tensor_arena[ANOMALY_TENSOR_ARENA_SIZE];
-
-extern LiquidCrystal_I2C lcd;
-extern float glob_temperature;
-extern float glob_humidity;
-
-extern SemaphoreHandle_t i2cMutex;   // <<--- thêm dòng này
 
 void setupTinyML_Anomaly() {
     static tflite::MicroErrorReporter anomaly_micro_error_reporter;
@@ -57,16 +59,13 @@ void tinyml_anomaly(void* pvParameters) {
     setupTinyML_Anomaly();
 
     while (true) {
-
         float temperature = glob_temperature;
         float humidity = glob_humidity;
 
-        // ==== LOCK I2C trước khi dùng interpreter + LCD + Neo ====
         if (xSemaphoreTake(i2cMutex, portMAX_DELAY)) 
         {
-            // TensorFlow input
-            anomaly_input->data.f[0] = temperature;  
-            anomaly_input->data.f[1] = humidity;    
+            anomaly_input->data.f[0] = temperature;
+            anomaly_input->data.f[1] = humidity;
 
             if (anomaly_interpreter->Invoke() != kTfLiteOk) {
                 anomaly_error_reporter->Report("Invoke failed");
@@ -75,34 +74,25 @@ void tinyml_anomaly(void* pvParameters) {
                 continue;
             }
 
-            float ir_value = anomaly_output->data.f[0];    
+            float ir_value = anomaly_output->data.f[0];
             int anomaly = (ir_value > 0.65f);
 
-            // ==== NeoPixel (nếu version dùng I2C) ====
             strip.setPixelColor(0, anomaly ? strip.Color(255,0,0)
                                            : strip.Color(0,0,255));
             strip.show();
 
-            // ==== LCD (I2C) ====
             lcd.clear();
             lcd.setCursor(0,0);
-            lcd.print("Hum: "); 
-            lcd.print(humidity,1); 
-            lcd.print("% T:");
-            lcd.print(temperature, 1);  
-            lcd.print(" C");
+            lcd.print("Hu:"); lcd.print(humidity,1); lcd.print("% T:");
+            lcd.print(temperature,1); lcd.print(" C");
 
             lcd.setCursor(0,1);
-            lcd.print("IR: "); 
-            lcd.print(ir_value,2);       
-            lcd.print(" "); 
-            lcd.print(anomaly ? "Anomaly" : "Normal");
+            lcd.print("IR:"); lcd.print(ir_value,2);
+            lcd.print(" "); lcd.print(anomaly ? "Anomaly" : "Normal");
 
-            xSemaphoreGive(i2cMutex);  
+            xSemaphoreGive(i2cMutex);
         }
-        // ================================
 
-        // Serial (không cần semaphore)
         Serial.print("Temp: "); Serial.print(temperature);
         Serial.print(" Hum: "); Serial.print(humidity);
         Serial.print(" IR: "); Serial.print(anomaly_output->data.f[0]);
