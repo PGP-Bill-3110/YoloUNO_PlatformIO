@@ -2,8 +2,12 @@
 float glob_temperature = 0;
 float glob_humidity = 0;
 
-String WIFI_SSID = "A55";
-String WIFI_PASS = "31102005";
+float api_temperature = 0;
+float api_humidity = 0;
+
+
+String WIFI_SSID = "E2 1421";
+String WIFI_PASS = "phuc3110";
 String CORE_IOT_TOKEN = "yr1akiur4otyf6wzqa94"; // phải chính xác
 String CORE_IOT_SERVER = "app.coreiot.io"; // phải chính xác
 String CORE_IOT_PORT;

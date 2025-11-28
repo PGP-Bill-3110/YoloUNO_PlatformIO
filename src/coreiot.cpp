@@ -1,4 +1,5 @@
 #include "coreiot.h"
+#define LED_GPIO 48
 
 // ----------- CONFIGURE THESE! -----------
 const char* coreIOT_Server = "app.coreiot.io";  
@@ -61,11 +62,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (strcmp(params, "ON") == 0) {
       Serial.println("Device turned ON.");
       //TODO
+digitalWrite(LED_GPIO, HIGH);
 
     } else {   
       Serial.println("Device turned OFF.");
       //TODO
-
+digitalWrite(LED_GPIO, LOW);
     }
   } else {
     Serial.print("Unknown method: ");

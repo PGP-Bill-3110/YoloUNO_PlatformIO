@@ -34,6 +34,9 @@ void startSTA()
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
+    Serial.println(" WiFi Connected!");
+    Serial.print(" IP Address: ");
+    Serial.println(WiFi.localIP());
     //Give a semaphore here
     xSemaphoreGive(xBinarySemaphoreInternet);
 }
@@ -62,7 +65,7 @@ void task_wifi(void *pvParameters)
         }
         else
         {
-            CORE_IOT_reconnect();
+            //CORE_IOT_reconnect();
         }
 
         vTaskDelay(1000); // chạy 1 lần mỗi giây
