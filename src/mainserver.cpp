@@ -314,11 +314,15 @@ void handleConnect()
 {
   wifi_ssid = server.arg("ssid");
   wifi_password = server.arg("pass");
+  
   server.send(200, "text/plain", "Connecting....");
+
   isAPMode = false;
   connecting = true;
   connect_start_ms = millis();
-  connectToWiFi();
+  //connectToWiFi();
+
+    xSemaphoreGive(xBinarySemaphoreInternet);
 }
 
 // ========== WiFi ==========
@@ -331,8 +335,8 @@ void setupServer()
   server.on("/connect", HTTP_GET, handleConnect);
   server.begin();
 }
-/*
-void startAP()
+
+void startAP_main()
 {
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid.c_str(), password.c_str());
@@ -341,7 +345,7 @@ void startAP()
   isAPMode = true;
   connecting = false;
 }
-*/
+/*
 void connectToWiFi()
 {
   WiFi.mode(WIFI_STA);
@@ -359,13 +363,13 @@ void connectToWiFi()
   Serial.print(" Password: ");
   Serial.print(wifi_password.c_str());
 }
-
+*/
 // ========== Main task ==========
 void main_server_task(void *pvParameters)
 {
   pinMode(BOOT_PIN, INPUT_PULLUP);
 
-  startAP();
+  startAP_main();
   setupServer();
 
   while (1)
@@ -380,7 +384,7 @@ void main_server_task(void *pvParameters)
       {
         if (!isAPMode)
         {
-          startAP();
+          startAP_main();
           setupServer();
         }
       }
@@ -403,7 +407,7 @@ void main_server_task(void *pvParameters)
       else if (millis() - connect_start_ms > 10000)
       { // timeout 10s
         Serial.println("WiFi connect failed! Back to AP.");
-        startAP();
+        startAP_main();
         setupServer();
         connecting = false;
         isWifiConnected = false;

@@ -15,7 +15,7 @@ extern WebServer server;
 String mainPage();
 String settingsPage();
 
-void startAP();
+void startAP_main();
 void setupServer();
 void connectToWiFi();
 
