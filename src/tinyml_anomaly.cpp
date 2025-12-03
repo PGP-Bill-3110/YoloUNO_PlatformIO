@@ -51,10 +51,10 @@ void setupTinyML_Anomaly() {
 
 void tinyml_anomaly(void* pvParameters) {
 
-    Adafruit_NeoPixel strip(LED_COUNT, NEO_PIN, NEO_GRB + NEO_KHZ800);
-    strip.begin();
-    strip.clear();
-    strip.show();
+    // Adafruit_NeoPixel strip(LED_COUNT, NEO_PIN, NEO_GRB + NEO_KHZ800);
+    // strip.begin();
+    // strip.clear();
+    // strip.show();
 
     setupTinyML_Anomaly();
 
@@ -77,9 +77,13 @@ void tinyml_anomaly(void* pvParameters) {
             float ir_value = anomaly_output->data.f[0];
             int anomaly = (ir_value > 0.65f);
 
-            strip.setPixelColor(0, anomaly ? strip.Color(255,0,0)
-                                           : strip.Color(0,0,255));
-            strip.show();
+            // Update global neoStrip safely
+            if (neoMutex && xSemaphoreTake(neoMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+                neoStrip.setPixelColor(0, anomaly ? neoStrip.Color(255,0,0)
+                                                   : neoStrip.Color(0,0,255));
+                neoStrip.show();
+                xSemaphoreGive(neoMutex);
+            }
 
             lcd.clear();
             lcd.setCursor(0,0);

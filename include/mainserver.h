@@ -7,6 +7,9 @@
 
 #define LED1_PIN 48
 #define LED2_PIN 41
+#define NEO_PIN 45
+#define LED_COUNT 1 
+
 #define BOOT_PIN 0
 extern WebServer server;
 
@@ -17,7 +20,7 @@ String settingsPage();
 
 void startAP_main();
 void setupServer();
-void connectToWiFi();
+void connectToWiFi_mainserver();
 
 void main_server_task(void *pvParameters);
 

@@ -20,4 +20,8 @@ boolean isWifiConnected = false;
 SemaphoreHandle_t xBinarySemaphoreInternet = xSemaphoreCreateBinary();
 LiquidCrystal_I2C lcd(33, 16, 2);
 SemaphoreHandle_t i2cMutex = NULL;
+Adafruit_NeoPixel neoStrip(LED_COUNT, NEO_PIN, NEO_GRB + NEO_KHZ800);
 DHT20 dht20;
+// Mutex and mode for controlling neoStrip safely across tasks
+SemaphoreHandle_t neoMutex = xSemaphoreCreateMutex();
+int neoColorMode = 0; // 0=OFF,1=RED,2=GREEN,3=BLUE

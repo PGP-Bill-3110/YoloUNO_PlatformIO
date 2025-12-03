@@ -1,33 +1,42 @@
 #include "neo_blinky.h"
-
+#include "global.h"
 
 void neo_blinky(void *pvParameters){
 
-    Adafruit_NeoPixel strip(LED_COUNT, NEO_PIN, NEO_GRB + NEO_KHZ800);
-    strip.begin();
-    // Set all pixels to off to start
-    strip.clear();
-    strip.show();
+    // Use the global neoStrip (initialized in global.cpp)
+    // Ensure neoStrip is ready
+    if (neoMutex && xSemaphoreTake(neoMutex, pdMS_TO_TICKS(200)) == pdTRUE) {
+        neoStrip.begin();
+        neoStrip.clear();
+        neoStrip.show();
+        xSemaphoreGive(neoMutex);
+    } else {
+        // fallback: try to init without mutex
+        neoStrip.begin();
+        neoStrip.clear();
+        neoStrip.show();
+    }
 
-    while(1) {                          
-        strip.setPixelColor(0, strip.Color(255, 0, 0)); // Set pixel 0 to red
-        strip.show(); // Update the strip
+    while(1) {
+        if (neoMutex && xSemaphoreTake(neoMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+            neoStrip.setPixelColor(0, neoStrip.Color(255, 0, 0)); // Red
+            neoStrip.show();
+            xSemaphoreGive(neoMutex);
+        }
+        vTaskDelay(pdMS_TO_TICKS(500));
 
-        // Wait for 500 milliseconds
-        vTaskDelay(500);
+        if (neoMutex && xSemaphoreTake(neoMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+            neoStrip.setPixelColor(0, neoStrip.Color(0, 255, 0)); // Green
+            neoStrip.show();
+            xSemaphoreGive(neoMutex);
+        }
+        vTaskDelay(pdMS_TO_TICKS(500));
 
-        // Set the pixel to off
-        strip.setPixelColor(0, strip.Color(0, 255, 0)); //red
-        strip.show(); // Update the strip
-
-        // Wait for another 500 milliseconds
-        vTaskDelay(500);
-
-                // Set the pixel to off
-        strip.setPixelColor(0, strip.Color(0, 0, 255)); // blue
-        strip.show(); // Update the strip
-
-        // Wait for another 500 milliseconds
-        vTaskDelay(500);
+        if (neoMutex && xSemaphoreTake(neoMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+            neoStrip.setPixelColor(0, neoStrip.Color(0, 0, 255)); // Blue
+            neoStrip.show();
+            xSemaphoreGive(neoMutex);
+        }
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }

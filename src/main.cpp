@@ -47,7 +47,7 @@ xTaskCreate(tinyml_anomaly, "TinyML Anomaly Task", 4096, NULL, 2, NULL);
 
 void loop()
 {
-  
+ /*
   if (check_info_File(1))
   {
     if (!Wifi_reconnect())
@@ -60,5 +60,5 @@ void loop()
     }
   }
   Webserver_reconnect();
-  
+  */
 }

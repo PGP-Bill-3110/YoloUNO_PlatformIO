@@ -7,6 +7,9 @@
 #include "freertos/semphr.h"
 #include <LiquidCrystal_I2C.h>
 #include "DHT20.h"
+#include <Adafruit_NeoPixel.h>
+#include "neo_blinky.h"
+
 extern float glob_temperature;
 extern float glob_humidity;
 
@@ -23,8 +26,11 @@ extern String CORE_IOT_PORT;
 extern boolean isWifiConnected;
 extern SemaphoreHandle_t xBinarySemaphoreInternet;
 extern SemaphoreHandle_t i2cMutex;
+extern SemaphoreHandle_t neoMutex;
+extern int neoColorMode;
 
 extern LiquidCrystal_I2C lcd;
+extern Adafruit_NeoPixel neoStrip;
 
 extern DHT20 dht20;
 extern String ssid;

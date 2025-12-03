@@ -13,19 +13,13 @@ void uart_send_data(const String& data) {
 }
 
 void task_uart_sender(void *pvParameters) {
-  // Delay ban đầu để cảm biến ổn định
+
   vTaskDelay(pdMS_TO_TICKS(3000));
 
-  // ---------------------------------------
-  //  Gửi HELLO đúng 1 lần duy nhất
-  // ---------------------------------------
   uart_send_data("**Hello from ESP32**");
   Serial.println("[UART] Sent once: **Hello from ESP32**");
 
-  // ------------------------------------
-  // ---
-  //  Sau đó CHỈ gửi độ ẩm liên tục
-  // ---------------------------------------
+ 
   while (true) {
     String msg = "HUMIDITY=" + String(glob_humidity, 2) + "%";
 
