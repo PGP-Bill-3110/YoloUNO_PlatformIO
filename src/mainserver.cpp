@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include "global.h"
+#include "task_check_info.h"
 
 bool led1_state = false;
 bool neo_state = false;
@@ -345,17 +346,24 @@ void handleSettings() { server.send(200, "text/html", settingsPage()); }
 
 void handleConnect()
 {
-  wifi_ssid = server.arg("ssid");
-  wifi_password = server.arg("pass");
+  // Update global WiFi credentials (will be used by task_wifi)
+  WIFI_SSID = server.arg("ssid");
+  WIFI_PASS = server.arg("pass");
 
   server.send(200, "text/plain", "Connecting....");
 
   isAPMode = false;
   connecting = true;
   connect_start_ms = millis();
-  connectToWiFi_mainserver();
-
-    xSemaphoreGive(xBinarySemaphoreInternet);
+  
+  // Save to file for persistence
+  Save_info_File(WIFI_SSID, WIFI_PASS, CORE_IOT_TOKEN, CORE_IOT_SERVER, CORE_IOT_PORT);
+  
+  // Let task_wifi handle the WiFi connection
+  // Do NOT call connectToWiFi_mainserver() here - it causes conflicts!
+  
+  // Restart ESP to reload config
+  ESP.restart();
 }
 
 // ========== WiFi ==========
@@ -415,6 +423,9 @@ void main_server_task(void *pvParameters)
   while (1)
   {
     server.handleClient();
+    
+    // Yield to higher priority tasks (WiFi, CoreIOT, etc.)
+    vTaskDelay(pdMS_TO_TICKS(10));
 
     // BOOT Button to switch to AP Mode
     if (digitalRead(BOOT_PIN) == LOW)
