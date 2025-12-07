@@ -10,17 +10,17 @@ void PrintSerialTask(void *pvParameters) {
             if (recv.temperature > 30.0){
                 Serial.print("[Warning] High temperature: ");
                 Serial.print(recv.temperature);
-                Serial.print("°C");
+                Serial.print("°C\n");
             } else if (recv.humidity > 80.0){
                 Serial.print("[Warning] High humidity: ");
                 Serial.print(recv.temperature);
-                Serial.print("%");
+                Serial.print("%\n");
             } else {
                 Serial.print("Temp=");
                 Serial.print(recv.temperature);
                 Serial.print("°C Humidity=");
                 Serial.print(recv.humidity);
-                Serial.print("%");
+                Serial.print("%\n");
             }
         }
     }
