@@ -1,7 +1,11 @@
 #include "global.h"
-#include "DHT20.h"
 #include "led_blinky.h"
 #include "neo_blinky.h"
+#include "DHT_sensor.h"
+#include "monitor.h"
+#include "queue.h"
+#include "button.h"
+
 #include "temp_humi_monitor.h"
 #include "mainserver.h"
 // #include "tinyml.h"
@@ -22,27 +26,31 @@
 void setup()
 {
   Serial.begin(115200);
+  Wire.begin(11, 12);
   check_info_File(0);
 
-    Wire.begin(11, 12);
-    dht20.begin();
-    lcd.begin();
-    lcd.backlight();
+  dht20.begin();
+  lcd.begin();
+  lcd.backlight();
 
+  xTaskCreate(led_blinky, "Task LED Blink", 2048, NULL, 2, NULL);
+  xTaskCreate(neo_blinky, "Task NEO Blink", 2048, NULL, 2, NULL);
+  xTaskCreate(dht_sensor, "DHT Sensor", 2048, NULL, 2, NULL);
+  xTaskCreate(LCD_task, "LCD Task", 2048, NULL, 2, NULL);
+  xTaskCreate(getKeyButton, "Button Task", 2048, NULL, 2, NULL);
+  xTaskCreate(PrintSerialTask, "Serial Task", 2048, NULL, 2, NULL);
 
-i2cMutex = xSemaphoreCreateMutex();
-
- // xTaskCreate(led_blinky, "Task LED Blink", 2048, NULL, 2, NULL);
-  //xTaskCreate(neo_blinky, "Task NEO Blink", 2048, NULL, 2, NULL);
- xTaskCreate(temp_humi_monitor, "Task TEMP HUMI Monitor", 2048, NULL, 2, NULL);
+  // xTaskCreate(led_blinky, "Task LED Blink", 2048, NULL, 2, NULL);
+  // xTaskCreate(neo_blinky, "Task NEO Blink", 2048, NULL, 2, NULL);
+  // xTaskCreate(temp_humi_monitor, "Task TEMP HUMI Monitor", 2048, NULL, 2, NULL);
   xTaskCreate(main_server_task, "Task Main Server" ,8192  ,NULL  ,1 , NULL);  // Priority 1 = lower
   // xTaskCreate( tiny_ml_task, "Tiny ML Task" ,2048  ,NULL  ,2 , NULL);
   xTaskCreate(task_wifi, "Task WiFi", 4096, NULL, 3, NULL);  // Priority 3 = higher, runs first
   xTaskCreate(coreiot_task, "CoreIOT Task" ,4096  ,NULL  ,2 , NULL);
   xTaskCreate(Task_Toogle_BOOT, "Task_Toogle_BOOT", 4096, NULL, 2, NULL);
   //xTaskCreate(task_uart_sender, "Task UART Sender", 2048, NULL, 2, NULL);
-//xTaskCreate(neo_humidity_task, "Neo Humidity Task", 2048, NULL, 2, NULL);
-xTaskCreate(tinyml_anomaly, "TinyML Anomaly Task", 4096, NULL, 2, NULL);
+  //xTaskCreate(neo_humidity_task, "Neo Humidity Task", 2048, NULL, 2, NULL);
+  // xTaskCreate(tinyml_anomaly, "TinyML Anomaly Task", 4096, NULL, 2, NULL);
 }
 
 void loop()

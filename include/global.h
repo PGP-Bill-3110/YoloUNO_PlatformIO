@@ -8,10 +8,45 @@
 #include <LiquidCrystal_I2C.h>
 #include "DHT20.h"
 #include <Adafruit_NeoPixel.h>
-#include "neo_blinky.h"
 
+//for queue.h - Cấu trúc dữ liệu của queue
+typedef struct {
+    float temperature;
+    float humidity;
+} SensorData_t;
+extern QueueHandle_t xSensorQueue;
+
+//for led_blinky.h
+#define LED_GPIO    48
+#define NORMAL_TEMP 0
+#define MED_TEMP    1
+#define HIGH_TEMP   2
+
+//for neo_blinky.h
+#define NEO_PIN             45
+#define LED_COUNT           1
+#define BREATHING_DELAY     20
+#define RAINBOW_SLOW_DELAY  100
+#define RAINBOW_FAST_DELAY  20
+extern int neo_status;
+extern Adafruit_NeoPixel neoStrip;
+
+//for button.h
+#define BUTTON  GPIO_NUM_0
+extern SemaphoreHandle_t xButtonSemaphore;
+
+//for DHT_sensor.h
+extern SemaphoreHandle_t xDataMutex;
+extern SemaphoreHandle_t xI2CMutex;
 extern float glob_temperature;
 extern float glob_humidity;
+extern DHT20 dht20;
+
+//for monitor.h
+extern char lcdBuffer[3][16];
+extern LiquidCrystal_I2C lcd;
+
+//
 
 extern float api_temperature;
 extern float api_humidity;
@@ -29,10 +64,6 @@ extern SemaphoreHandle_t i2cMutex;
 extern SemaphoreHandle_t neoMutex;
 extern int neoColorMode;
 
-extern LiquidCrystal_I2C lcd;
-extern Adafruit_NeoPixel neoStrip;
-
-extern DHT20 dht20;
 extern String ssid;
 extern String password; 
 extern String wifi_ssid;
