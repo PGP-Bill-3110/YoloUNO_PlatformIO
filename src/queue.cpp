@@ -1,7 +1,5 @@
 #include "queue.h"
 
-QueueHandle_t xSensorQueue;
-
 void PrintSerialTask(void *pvParameters) {
     SensorData_t recv;
 

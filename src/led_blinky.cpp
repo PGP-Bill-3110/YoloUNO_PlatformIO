@@ -10,6 +10,11 @@ void led_blinky(void *pvParameters){
     //High state: high for 3 seconds (when changed first time), then blinks every 200ms
     //Every button press: blinks fast 5 times
 
+    if(fsm_state != FSM_NORMAL){
+      vTaskDelay(100);
+      continue;
+    }
+
     if(xSemaphoreTake(xButtonSemaphore, 0) == pdTRUE){
       for(int i=0; i<5; ++i){
         digitalWrite(LED_GPIO, HIGH);

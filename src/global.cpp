@@ -22,6 +22,13 @@ SemaphoreHandle_t xI2CMutex = xSemaphoreCreateMutex();
 LiquidCrystal_I2C lcd(33, 16, 2);
 char lcdBuffer[3][16] = {"Temp: 0.00C", "Humid: 0.00%", "State: NORMAL"};
 
+//for mainserver.h
+bool fsm_mode = false;
+bool tinyml_mode = false;
+
+//for fsm_ctrl.h
+int fsm_state = FSM_NORMAL;
+
 //
 
 float api_temperature = 0;

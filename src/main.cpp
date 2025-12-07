@@ -5,8 +5,8 @@
 #include "monitor.h"
 #include "queue.h"
 #include "button.h"
+#include "fsm_ctrl.h"
 
-#include "temp_humi_monitor.h"
 #include "mainserver.h"
 // #include "tinyml.h"
  #include "coreiot.h"
@@ -18,7 +18,6 @@
 #include "task_core_iot.h"
 
 #include "uart.h"
-#include "neo_humidity.h"
 #include "tinyml_anomaly.h"
 
 
@@ -39,17 +38,16 @@ void setup()
   xTaskCreate(LCD_task, "LCD Task", 2048, NULL, 2, NULL);
   xTaskCreate(getKeyButton, "Button Task", 2048, NULL, 2, NULL);
   xTaskCreate(PrintSerialTask, "Serial Task", 2048, NULL, 2, NULL);
+  xTaskCreate(fsmCtrlTask, "FSM Control Task", 2048, NULL, 2, NULL);
 
   // xTaskCreate(led_blinky, "Task LED Blink", 2048, NULL, 2, NULL);
   // xTaskCreate(neo_blinky, "Task NEO Blink", 2048, NULL, 2, NULL);
-  // xTaskCreate(temp_humi_monitor, "Task TEMP HUMI Monitor", 2048, NULL, 2, NULL);
   xTaskCreate(main_server_task, "Task Main Server" ,8192  ,NULL  ,1 , NULL);  // Priority 1 = lower
   // xTaskCreate( tiny_ml_task, "Tiny ML Task" ,2048  ,NULL  ,2 , NULL);
   xTaskCreate(task_wifi, "Task WiFi", 4096, NULL, 3, NULL);  // Priority 3 = higher, runs first
   xTaskCreate(coreiot_task, "CoreIOT Task" ,4096  ,NULL  ,2 , NULL);
   xTaskCreate(Task_Toogle_BOOT, "Task_Toogle_BOOT", 4096, NULL, 2, NULL);
   //xTaskCreate(task_uart_sender, "Task UART Sender", 2048, NULL, 2, NULL);
-  //xTaskCreate(neo_humidity_task, "Neo Humidity Task", 2048, NULL, 2, NULL);
   // xTaskCreate(tinyml_anomaly, "TinyML Anomaly Task", 4096, NULL, 2, NULL);
 }
 

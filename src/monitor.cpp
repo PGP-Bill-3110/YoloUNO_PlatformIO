@@ -22,6 +22,11 @@ void LCD_task(void *pvParameters){
     int critRep = 0;
 
     while(1){
+        if(fsm_state == FSM_TINYML){
+            vTaskDelay(100);
+            continue;
+        }
+
         xSemaphoreTake(xDataMutex, portMAX_DELAY);
         float temp = glob_temperature;
         float humid = glob_humidity;

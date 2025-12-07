@@ -51,6 +51,11 @@ void neo_blinky(void *pvParameters){
     float hue = 0; // for rainbow effect
 
     while(1) {
+        if(fsm_state != FSM_NORMAL){
+            vTaskDelay(100);
+            continue;
+        }
+
         xSemaphoreTake(xDataMutex, portMAX_DELAY);
         float humid = glob_humidity;
         xSemaphoreGive(xDataMutex);

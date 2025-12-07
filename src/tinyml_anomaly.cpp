@@ -1,12 +1,4 @@
 #include "tinyml_anomaly.h"
-#include "global.h"
-#include <Adafruit_NeoPixel.h>
-
-extern LiquidCrystal_I2C lcd;
-extern float glob_temperature;
-extern float glob_humidity;
-extern SemaphoreHandle_t i2cMutex;
-extern DHT20 dht20;
 
 tflite::ErrorReporter* anomaly_error_reporter = nullptr;
 tflite::MicroInterpreter* anomaly_interpreter = nullptr;
@@ -58,18 +50,25 @@ void tinyml_anomaly(void* pvParameters) {
 
     setupTinyML_Anomaly();
 
-    while (true) {
+    while (1) {
+        if(fsm_state != FSM_TINYML) {
+            vTaskDelay(pdMS_TO_TICKS(100));
+            continue;
+        }
+
+        xSemaphoreTake(xDataMutex, portMAX_DELAY);
         float temperature = glob_temperature;
         float humidity = glob_humidity;
+        xSemaphoreGive(xDataMutex);
 
-        if (xSemaphoreTake(i2cMutex, portMAX_DELAY)) 
+        if (xSemaphoreTake(xI2CMutex, portMAX_DELAY)) 
         {
             anomaly_input->data.f[0] = temperature;
             anomaly_input->data.f[1] = humidity;
 
             if (anomaly_interpreter->Invoke() != kTfLiteOk) {
                 anomaly_error_reporter->Report("Invoke failed");
-                xSemaphoreGive(i2cMutex);
+                xSemaphoreGive(xI2CMutex);
                 vTaskDelay(pdMS_TO_TICKS(1000));
                 continue;
             }
@@ -94,7 +93,7 @@ void tinyml_anomaly(void* pvParameters) {
             lcd.print("IR:"); lcd.print(ir_value,2);
             lcd.print(" "); lcd.print(anomaly ? "Anomaly" : "Normal");
 
-            xSemaphoreGive(i2cMutex);
+            xSemaphoreGive(xI2CMutex);
         }
 
         Serial.print("Temp: "); Serial.print(temperature);

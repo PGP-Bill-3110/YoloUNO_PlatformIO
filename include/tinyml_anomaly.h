@@ -2,9 +2,6 @@
 #define TINYML_ANOMALY_H
 
 #include <Arduino.h>
-#include <LiquidCrystal_I2C.h>
-#include "DHT20.h"
-#include <Adafruit_NeoPixel.h>
 #include "global.h"
 #include "dht_anomaly_model.h"
 #include "neo_blinky.h"   
@@ -25,3 +22,4 @@ void setupTinyML_Anomaly();
 void tinyml_anomaly(void *pvParameters);
 
 #endif
+

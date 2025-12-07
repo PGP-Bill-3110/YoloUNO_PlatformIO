@@ -9,7 +9,7 @@
 #include "DHT20.h"
 #include <Adafruit_NeoPixel.h>
 
-//for queue.h - Cấu trúc dữ liệu của queue
+//for queue.h
 typedef struct {
     float temperature;
     float humidity;
@@ -32,7 +32,8 @@ extern int neo_status;
 extern Adafruit_NeoPixel neoStrip;
 
 //for button.h
-#define BUTTON  GPIO_NUM_0
+#define BUTTON      GPIO_NUM_0
+#define BOOT_PIN    0
 extern SemaphoreHandle_t xButtonSemaphore;
 
 //for DHT_sensor.h
@@ -45,6 +46,19 @@ extern DHT20 dht20;
 //for monitor.h
 extern char lcdBuffer[3][16];
 extern LiquidCrystal_I2C lcd;
+
+//for mainserver.h
+extern bool fsm_mode;
+extern bool tinyml_mode;
+// extern volatile bool fsm_mode;
+// extern volatile bool tinyml_mode;
+
+//for fsm_ctrl.h
+#define FSM_NORMAL  0
+#define FSM_CONFIG  1
+#define FSM_TINYML  2
+extern int fsm_state;
+// extern volatile int fsm_state;
 
 //
 
