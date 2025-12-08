@@ -76,7 +76,6 @@ extern boolean isWifiConnected;
 extern SemaphoreHandle_t xBinarySemaphoreInternet;
 extern SemaphoreHandle_t i2cMutex;
 extern SemaphoreHandle_t neoMutex;
-extern int neoColorMode;
 
 extern String ssid;
 extern String password; 

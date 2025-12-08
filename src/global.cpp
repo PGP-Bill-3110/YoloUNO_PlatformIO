@@ -52,4 +52,3 @@ SemaphoreHandle_t i2cMutex = xSemaphoreCreateMutex();
 
 // Mutex and mode for controlling neoStrip safely across tasks
 SemaphoreHandle_t neoMutex = xSemaphoreCreateMutex();
-int neoColorMode = 0; // 0=OFF,1=RED,2=GREEN,3=BLUE
