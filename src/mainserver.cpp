@@ -396,6 +396,7 @@ void setupServer()
 
 void startAP_main()
 {
+  WiFi.disconnect();
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAP(ssid.c_str(), password.c_str());
   Serial.print("AP IP address: ");
@@ -410,6 +411,8 @@ void connectToWiFi_mainserver()
   {
     vTaskDelay(NULL);
   }
+  WiFi.softAPdisconnect(true);
+  WiFi.mode(WIFI_STA);
   if (WIFI_PASS.isEmpty())
   {
     WiFi.begin(WIFI_SSID.c_str());
@@ -485,6 +488,7 @@ void main_server_task(void *pvParameters)
 
         isAPMode = false;
         connecting = false;
+        started = true;
       }
       else if (millis() - connect_start_ms > 10000)
       { // timeout 10s
@@ -493,6 +497,7 @@ void main_server_task(void *pvParameters)
         setupServer();
         connecting = false;
         isWifiConnected = false;
+        started = false;
       }
     }
 
