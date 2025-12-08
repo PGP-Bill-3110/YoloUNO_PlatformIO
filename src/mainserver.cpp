@@ -461,7 +461,11 @@ void main_server_task(void *pvParameters)
     // STA Mode
     if (connecting)
     {
-      connectToWiFi_mainserver();
+      if(!isWifiConnected){
+        connectToWiFi_mainserver();
+        isWifiConnected = true; // Prevent multiple calls
+      }
+
       if (WiFi.status() == WL_CONNECTED)
       {
         Serial.print("STA IP address: ");

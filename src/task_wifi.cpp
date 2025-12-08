@@ -61,11 +61,11 @@ void task_wifi(void *pvParameters)
     {
         if (!Wifi_reconnect())
         {
-           // Webserver_stop();
+        //    Webserver_stop();
         }
         else
         {
-            //CORE_IOT_reconnect();
+            // CORE_IOT_reconnect();
         }
 
         vTaskDelay(1000); // chạy 1 lần mỗi giây
