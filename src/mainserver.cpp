@@ -396,8 +396,6 @@ void setupServer()
 
 void startAP_main()
 {
-  WiFi.mode(WIFI_OFF);
-  vTaskDelay(200);
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid.c_str(), password.c_str());
   Serial.print("AP IP address: ");
@@ -408,8 +406,10 @@ void startAP_main()
 
 void connectToWiFi_mainserver()
 {
-  WiFi.mode(WIFI_OFF);
-  vTaskDelay(200);
+  if (WIFI_SSID.isEmpty())
+  {
+    vTaskDelay(NULL);
+  }
   WiFi.mode(WIFI_STA);
   if (WIFI_PASS.isEmpty())
   {
@@ -419,6 +419,11 @@ void connectToWiFi_mainserver()
   {
     WiFi.begin(WIFI_SSID.c_str(), WIFI_PASS.c_str());
   }
+
+  while (WiFi.status() != WL_CONNECTED) {
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+  }
+
   Serial.print("Connecting to: ");
   Serial.print(WIFI_SSID.c_str());
 
