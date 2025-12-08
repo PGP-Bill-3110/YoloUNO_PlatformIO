@@ -407,19 +407,19 @@ void startAP_main()
 void connectToWiFi_mainserver()
 {
   WiFi.mode(WIFI_STA);
-  if (WIFI_PASS.isEmpty())
+  if (wifi_password.isEmpty())
   {
-    WiFi.begin(WIFI_SSID.c_str());
+    WiFi.begin(wifi_ssid.c_str());
   }
   else
   {
-    WiFi.begin(WIFI_SSID.c_str(), WIFI_PASS.c_str());
+    WiFi.begin(wifi_ssid.c_str(), wifi_password.c_str());
   }
   Serial.print("Connecting to: ");
-  Serial.print(WIFI_SSID.c_str());
+  Serial.print(wifi_ssid.c_str());
 
   Serial.print(" Password: ");
-  Serial.print(WIFI_PASS.c_str());
+  Serial.print(wifi_password.c_str());
 }
 
 // ========== Main task ==========
