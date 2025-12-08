@@ -372,6 +372,9 @@ void handleConnect()
   isAPMode = false;
   connecting = true;
   connect_start_ms = millis();
+
+  // Debug log for connecting state
+  Serial.println("[handleConnect] connecting set to true");
   
   // Save to file for persistence
   Save_info_File(WIFI_SSID, WIFI_PASS, CORE_IOT_TOKEN, CORE_IOT_SERVER, CORE_IOT_PORT);
