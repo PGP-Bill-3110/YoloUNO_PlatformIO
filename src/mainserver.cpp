@@ -380,7 +380,7 @@ void handleConnect()
   // Do NOT call connectToWiFi_mainserver() here - it causes conflicts!
   
   // Restart ESP to reload config
-  ESP.restart();
+  // ESP.restart();
 }
 
 // ========== WiFi ==========
@@ -407,19 +407,19 @@ void startAP_main()
 void connectToWiFi_mainserver()
 {
   WiFi.mode(WIFI_STA);
-  if (wifi_password.isEmpty())
+  if (WIFI_PASS.isEmpty())
   {
-    WiFi.begin(wifi_ssid.c_str());
+    WiFi.begin(WIFI_SSID.c_str());
   }
   else
   {
-    WiFi.begin(wifi_ssid.c_str(), wifi_password.c_str());
+    WiFi.begin(WIFI_SSID.c_str(), WIFI_PASS.c_str());
   }
   Serial.print("Connecting to: ");
-  Serial.print(wifi_ssid.c_str());
+  Serial.print(WIFI_SSID.c_str());
 
   Serial.print(" Password: ");
-  Serial.print(wifi_password.c_str());
+  Serial.print(WIFI_PASS.c_str());
 }
 
 // ========== Main task ==========
@@ -430,9 +430,9 @@ void main_server_task(void *pvParameters)
   pinMode(LED_GPIO, OUTPUT);
   pinMode(NEO_PIN, OUTPUT);
 
-    neoStrip.begin();
-    neoStrip.clear();
-    neoStrip.show();
+  neoStrip.begin();
+  neoStrip.clear();
+  neoStrip.show();
 
   startAP_main();
   setupServer();
@@ -461,6 +461,7 @@ void main_server_task(void *pvParameters)
     // STA Mode
     if (connecting)
     {
+      connectToWiFi_mainserver();
       if (WiFi.status() == WL_CONNECTED)
       {
         Serial.print("STA IP address: ");
