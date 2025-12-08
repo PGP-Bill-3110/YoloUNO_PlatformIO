@@ -396,6 +396,8 @@ void setupServer()
 
 void startAP_main()
 {
+  WiFi.mode(WIFI_OFF);
+  vTaskDelay(200);
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid.c_str(), password.c_str());
   Serial.print("AP IP address: ");
@@ -406,6 +408,8 @@ void startAP_main()
 
 void connectToWiFi_mainserver()
 {
+  WiFi.mode(WIFI_OFF);
+  vTaskDelay(200);
   WiFi.mode(WIFI_STA);
   if (WIFI_PASS.isEmpty())
   {
@@ -463,7 +467,7 @@ void main_server_task(void *pvParameters)
     {
       if(!isWifiConnected){
         connectToWiFi_mainserver();
-        isWifiConnected = true; // Prevent multiple calls
+        // isWifiConnected = true; // Prevent multiple calls
       }
 
       if (WiFi.status() == WL_CONNECTED)
