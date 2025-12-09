@@ -16,10 +16,14 @@ void startSTA()
 {
     if (WIFI_SSID.isEmpty())
     {
-        vTaskDelete(NULL);
+        Serial.println("[WiFi] SSID is empty, cannot connect");
+        return;
     }
 
+    Serial.printf("[WiFi] Connecting to %s...\n", WIFI_SSID.c_str());
+    
     WiFi.mode(WIFI_STA);
+    WiFi.disconnect(true); // Disconnect and turn off AP
 
     if (WIFI_PASS.isEmpty())
     {
@@ -30,15 +34,30 @@ void startSTA()
         WiFi.begin(WIFI_SSID.c_str(), WIFI_PASS.c_str());
     }
 
-    while (WiFi.status() != WL_CONNECTED)
+    unsigned long start_time = millis();
+    int attempt = 0;
+    while (WiFi.status() != WL_CONNECTED && attempt < 30) // 30 * 500ms = 15s timeout
     {
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+        Serial.print(".");
+        attempt++;
     }
-    Serial.println(" WiFi Connected!");
-    Serial.print(" IP Address: ");
-    Serial.println(WiFi.localIP());
-    //Give a semaphore here
-    xSemaphoreGive(xBinarySemaphoreInternet);
+    
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        Serial.println("");
+        Serial.println("[WiFi] WiFi Connected!");
+        Serial.print("[WiFi] IP Address: ");
+        Serial.println(WiFi.localIP());
+        isWifiConnected = true;
+        xSemaphoreGive(xBinarySemaphoreInternet);
+    }
+    else
+    {
+        Serial.println("");
+        Serial.println("[WiFi] Failed to connect to WiFi");
+        isWifiConnected = false;
+    }
 }
 
 bool Wifi_reconnect()
@@ -54,20 +73,35 @@ bool Wifi_reconnect()
 
 void task_wifi(void *pvParameters)
 {
-    // Kết nối lần đầu
-    startSTA();
+    // Initial connection attempt if SSID is available
+    if (!WIFI_SSID.isEmpty())
+    {
+        Serial.println("[WiFi Task] Starting initial WiFi connection...");
+        startSTA();
+    }
 
     for (;;)
     {
-        if (!Wifi_reconnect())
+        if (xSemaphoreTake(xBinarySemaphoreInternet, pdMS_TO_TICKS(5000)) == pdTRUE)
         {
-        //    Webserver_stop();
+            // Semaphore given - try to connect
+            if (!WIFI_SSID.isEmpty())
+            {
+                Serial.println("[WiFi Task] Connecting to WiFi...");
+                startSTA();
+            }
+        }
+        
+        // Check connection status periodically
+        if (WiFi.status() == WL_CONNECTED)
+        {
+            isWifiConnected = true;
         }
         else
         {
-            // CORE_IOT_reconnect();
+            isWifiConnected = false;
         }
-
-        vTaskDelay(1000); // chạy 1 lần mỗi giây
+        
+        vTaskDelay(5000); // Check every 5 seconds
     } 
 }

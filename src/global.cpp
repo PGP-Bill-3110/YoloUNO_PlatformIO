@@ -35,16 +35,16 @@ float api_temperature = 0;
 float api_humidity = 0;
 
 
-String WIFI_SSID = "E2 1421";
-String WIFI_PASS = "phuc3110";
-String CORE_IOT_TOKEN = "yr1akiur4otyf6wzqa94"; // phải chính xác
-String CORE_IOT_SERVER = "app.coreiot.io"; // phải chính xác
-String CORE_IOT_PORT;
+// Default values - will be overwritten by config file (/littlefs/info.dat)
+String WIFI_SSID = "";           // Will load from file or be set via /connect endpoint
+String WIFI_PASS = "";           // Will load from file or be set via /connect endpoint
+String CORE_IOT_TOKEN = "yr1akiur4otyf6wzqa94"; // Will load from file
+String CORE_IOT_SERVER = "app.coreiot.io"; // Will load from file
+String CORE_IOT_PORT = "1883";
 
+// AP Mode credentials (fallback when WiFi unavailable)
 String ssid = "ESP32-YOUR NETWORK HERE!!!";
 String password = "12345678";
-String wifi_ssid = "E2 1421";
-String wifi_password = "phuc3110";
 boolean isWifiConnected = false;
 
 SemaphoreHandle_t xBinarySemaphoreInternet = xSemaphoreCreateBinary();

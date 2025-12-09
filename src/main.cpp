@@ -42,30 +42,24 @@ void setup()
 
   // xTaskCreate(led_blinky, "Task LED Blink", 2048, NULL, 2, NULL);
   // xTaskCreate(neo_blinky, "Task NEO Blink", 2048, NULL, 2, NULL);
-  xTaskCreate(main_server_task, "Task Main Server" ,8192  ,NULL  ,1 , NULL);  // Priority 1 = lower
-  xTaskCreate(wifi_task, "Task WIFI" ,4096  ,NULL  ,3 , NULL);
+  xTaskCreate(main_server_task, "Task Main Server" ,8192  ,NULL  ,2 , NULL);  // Priority 2
+  xTaskCreate(task_wifi, "Task WIFI" ,4096  ,NULL  ,3 , NULL);  // Priority 3 = higher
   // xTaskCreate( tiny_ml_task, "Tiny ML Task" ,2048  ,NULL  ,2 , NULL);
   // xTaskCreate(task_wifi, "Task WiFi", 4096, NULL, 3, NULL);  // Priority 3 = higher, runs first
   xTaskCreate(coreiot_task, "CoreIOT Task" ,4096  ,NULL  ,2 , NULL);
   xTaskCreate(Task_Toogle_BOOT, "Task_Toogle_BOOT", 4096, NULL, 2, NULL);
   //xTaskCreate(task_uart_sender, "Task UART Sender", 2048, NULL, 2, NULL);
   // xTaskCreate(tinyml_anomaly, "TinyML Anomaly Task", 4096, NULL, 2, NULL);
+  
+  // Initialize semaphore - give it once if WiFi credentials exist
+  if (!WIFI_SSID.isEmpty())
+  {
+    xSemaphoreGive(xBinarySemaphoreInternet);
+  }
 }
 
 void loop()
 {
- 
-  // if (check_info_File(1))
-  // {
-  //   if (!Wifi_reconnect())
-  //   {
-  //    // Webserver_stop();
-  //   }
-  //   else
-  //   {
-  //   //  CORE_IOT_reconnect();
-  //   }
-  // }
-  // Webserver_reconnect();
+
   
 }

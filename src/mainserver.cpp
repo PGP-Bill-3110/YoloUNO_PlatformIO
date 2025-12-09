@@ -360,6 +360,75 @@ void handleSensors()
 
 void handleSettings() { server.send(200, "text/html", settingsPage()); }
 
+void handleWiFiStatus()
+{
+  String status = "Not connected";
+  String ip = "";
+  
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    status = "Connected";
+    ip = WiFi.localIP().toString();
+  }
+  else if (isAPMode)
+  {
+    status = "AP Mode";
+    ip = WiFi.softAPIP().toString();
+  }
+  
+  String json = "{\"status\":\"" + status + "\",\"ip\":\"" + ip + "\",\"ssid\":\"" + WIFI_SSID + "\"}";
+  server.send(200, "application/json", json);
+}
+
+void handleModeSwitch()
+{
+  String action = server.arg("action");
+  
+  if (action == "toAP")
+  {
+    if (!isAPMode)
+    {
+      Serial.println("[Main Server] Switching to AP mode...");
+      startAP_main();
+      setupServer();
+      isAPMode = true;
+      server.send(200, "text/plain", "Switched to AP mode. AP IP: " + WiFi.softAPIP().toString());
+    }
+    else
+    {
+      server.send(200, "text/plain", "Already in AP mode. IP: " + WiFi.softAPIP().toString());
+    }
+  }
+  else if (action == "toSTA")
+  {
+    if (isAPMode)
+    {
+      Serial.println("[Main Server] Switching to STA mode...");
+      WiFi.disconnect();
+      WiFi.mode(WIFI_STA);
+      isAPMode = false;
+      
+      if (!WIFI_SSID.isEmpty())
+      {
+        WiFi.begin(WIFI_SSID.c_str(), WIFI_PASS.c_str());
+        server.send(200, "text/plain", "Switched to STA mode. Connecting to " + WIFI_SSID + "...");
+      }
+      else
+      {
+        server.send(200, "text/plain", "No WiFi credentials saved. Please configure first.");
+      }
+    }
+    else
+    {
+      server.send(200, "text/plain", "Already in STA mode. IP: " + WiFi.localIP().toString());
+    }
+  }
+  else
+  {
+    server.send(400, "text/plain", "Invalid action. Use toAP or toSTA");
+  }
+}
+
 void handleConnect()
 {
   Serial.println(">>> handleConnect CALLED <<<");
@@ -367,21 +436,15 @@ void handleConnect()
   WIFI_SSID = server.arg("ssid");
   WIFI_PASS = server.arg("pass");
 
-  server.send(200, "text/plain", "Connecting....");
-
-  // Debug log for connecting state
-  // Serial.printf("[handleConnect] connecting set to %d\n", connecting);
-  
   // Save to file for persistence
   Save_info_File(WIFI_SSID, WIFI_PASS, CORE_IOT_TOKEN, CORE_IOT_SERVER, CORE_IOT_PORT);
 
-  xSemaphoreGive(xBinarySemaphoreInternet);
-  
-  // Let task_wifi handle the WiFi connection
-  // Do NOT call connectToWiFi_mainserver() here - it causes conflicts!
+  server.send(200, "text/plain", "Connecting.... (ESP will restart in 2 seconds)");
+
+  vTaskDelay(pdMS_TO_TICKS(2000));
   
   // Restart ESP to reload config
-  // ESP.restart();
+  ESP.restart();
 }
 
 // ========== WiFi ==========
@@ -392,6 +455,8 @@ void setupServer()
   server.on("/sensors", HTTP_GET, handleSensors);
   server.on("/settings", HTTP_GET, handleSettings);
   server.on("/connect", HTTP_GET, handleConnect);
+  server.on("/wifistatus", HTTP_GET, handleWiFiStatus);
+  server.on("/modeswitch", HTTP_GET, handleModeSwitch);
   server.begin();
 }
 
@@ -400,54 +465,8 @@ void startAP_main()
   WiFi.disconnect();
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid.c_str(), password.c_str());
-  Serial.print("[WiFi Task] AP IP address: ");
+  Serial.print("[Main Server] AP IP address: ");
   Serial.println(WiFi.softAPIP());
-}
-
-void startSTA_main()
-{
-  if(WIFI_SSID.isEmpty()){
-    Serial.println("[WiFi Task] SSID is empty, cannot connect.");
-    return;
-  }
-
-  WiFi.softAPdisconnect(true);
-  WiFi.mode(WIFI_STA);
-  if (WIFI_PASS.isEmpty())
-  {
-    WiFi.begin(WIFI_SSID.c_str());
-  }
-  else
-  {
-    WiFi.begin(WIFI_SSID.c_str(), WIFI_PASS.c_str());
-  }
-
-  connect_start_ms = millis();
-  while(WiFi.status() != WL_CONNECTED && millis() - connect_start_ms < 15000) // 15s timeout
-  {
-    vTaskDelay(500);
-    Serial.print(".");
-  }
-}
-
-void wifi_task(void *pvParameters) {
-  while(1) {
-    if(xSemaphoreTake(xBinarySemaphoreInternet, portMAX_DELAY) == pdTRUE) {
-      Serial.println("[WiFi Task] Start connecting STA...");
-      startSTA_main();
-
-      if(WiFi.status() == WL_CONNECTED) {
-        Serial.println("\n[WiFi Task] Connected to WiFi!");
-        Serial.print("[WiFi Task] STA IP Address: ");
-        Serial.println(WiFi.localIP());
-        isAPMode = false;
-      } else {
-        Serial.println("\n[WiFi Task] Failed to connect.");
-        startAP_main();
-        isAPMode = true;
-      }
-    }
-  }
 }
 
 // ========== Main task ==========
@@ -462,7 +481,43 @@ void main_server_task(void *pvParameters)
   neoStrip.clear();
   neoStrip.show();
 
-  startAP_main();
+  // Check if WiFi credentials exist - if yes, wait for WiFi to connect
+  // If no credentials, start AP mode immediately
+  if (WIFI_SSID.isEmpty())
+  {
+    Serial.println("[Main Server] No WiFi credentials, starting AP mode...");
+    startAP_main();
+    isAPMode = true;
+  }
+  else
+  {
+    Serial.println("[Main Server] WiFi credentials found, waiting for connection...");
+    isAPMode = false;
+    // Wait up to 20 seconds for WiFi to connect
+    unsigned long start = millis();
+    int dots = 0;
+    while (!isAPMode && millis() - start < 20000)
+    {
+      if (WiFi.status() == WL_CONNECTED)
+      {
+        Serial.println("");
+        Serial.println("[Main Server] WiFi connected!");
+        break;
+      }
+      if (dots++ % 4 == 0) Serial.print(".");
+      vTaskDelay(pdMS_TO_TICKS(500));
+    }
+    // If still not connected, fall back to AP mode
+    if (WiFi.status() != WL_CONNECTED)
+    {
+      Serial.println("");
+      Serial.println("[Main Server] WiFi connection timeout (20s), starting AP mode...");
+      Serial.printf("[Main Server] WiFi Status Code: %d\n", WiFi.status());
+      startAP_main();
+      isAPMode = true;
+    }
+  }
+  
   setupServer();
 
   while (1)
@@ -482,6 +537,7 @@ void main_server_task(void *pvParameters)
         {
           startAP_main();
           setupServer();
+          isAPMode = true;
         }
       }
     }
