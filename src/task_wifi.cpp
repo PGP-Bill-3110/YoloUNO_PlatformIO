@@ -25,7 +25,7 @@ void startSTA()
     {
         WiFi.begin(WIFI_SSID.c_str());
     }
-    else
+    else 
     {
         WiFi.begin(WIFI_SSID.c_str(), WIFI_PASS.c_str());
     }

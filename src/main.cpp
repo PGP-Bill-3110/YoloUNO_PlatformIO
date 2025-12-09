@@ -43,6 +43,7 @@ void setup()
   // xTaskCreate(led_blinky, "Task LED Blink", 2048, NULL, 2, NULL);
   // xTaskCreate(neo_blinky, "Task NEO Blink", 2048, NULL, 2, NULL);
   xTaskCreate(main_server_task, "Task Main Server" ,8192  ,NULL  ,1 , NULL);  // Priority 1 = lower
+  xTaskCreate(wifi_task, "Task WIFI" ,4096  ,NULL  ,3 , NULL);
   // xTaskCreate( tiny_ml_task, "Tiny ML Task" ,2048  ,NULL  ,2 , NULL);
   // xTaskCreate(task_wifi, "Task WiFi", 4096, NULL, 3, NULL);  // Priority 3 = higher, runs first
   xTaskCreate(coreiot_task, "CoreIOT Task" ,4096  ,NULL  ,2 , NULL);

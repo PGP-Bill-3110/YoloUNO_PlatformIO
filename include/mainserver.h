@@ -16,6 +16,7 @@ void startAP_main();
 void setupServer();
 void connectToWiFi_mainserver();
 
+void wifi_task(void *pvParameters);
 void main_server_task(void *pvParameters);
 
 #endif
