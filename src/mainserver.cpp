@@ -468,6 +468,7 @@ void main_server_task(void *pvParameters)
         }
       }
     }
+    Serial.printf("connecting: %d\n", connecting);
 
     // STA Mode
     if (connecting)
@@ -488,7 +489,7 @@ void main_server_task(void *pvParameters)
 
         isAPMode = false;
         connecting = false;
-        started = true;
+        started = false;
       }
       else if (millis() - connect_start_ms > 10000)
       { // timeout 10s
