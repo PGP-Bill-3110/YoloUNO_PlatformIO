@@ -363,6 +363,7 @@ void handleSettings() { server.send(200, "text/html", settingsPage()); }
 
 void handleConnect()
 {
+  Serial.println(">>> handleConnect CALLED <<<");
   // Update global WiFi credentials (will be used by task_wifi)
   WIFI_SSID = server.arg("ssid");
   WIFI_PASS = server.arg("pass");
@@ -372,6 +373,9 @@ void handleConnect()
   isAPMode = false;
   connecting = true;
   connect_start_ms = millis();
+
+  // Debug log for connecting state
+  Serial.printf("[handleConnect] connecting set to %d\n", connecting);
   
   // Save to file for persistence
   Save_info_File(WIFI_SSID, WIFI_PASS, CORE_IOT_TOKEN, CORE_IOT_SERVER, CORE_IOT_PORT);
@@ -468,7 +472,6 @@ void main_server_task(void *pvParameters)
         }
       }
     }
-    Serial.printf("connecting: %d\n", connecting);
 
     // STA Mode
     if (connecting)
