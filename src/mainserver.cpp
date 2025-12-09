@@ -407,9 +407,9 @@ void startAP_main()
 
 void connectToWiFi_mainserver()
 {
-  if (WIFI_SSID.isEmpty())
-  {
-    vTaskDelay(NULL);
+  if(WIFI_SSID.isEmpty()){
+    Serial.println("[WIFI] SSID is empty, cannot connect.");
+    return;
   }
   WiFi.softAPdisconnect(true);
   WiFi.mode(WIFI_STA);
@@ -498,6 +498,8 @@ void main_server_task(void *pvParameters)
         connecting = false;
         isWifiConnected = false;
         started = false;
+      } else {
+        Serial.print("I'm fucked");
       }
     }
 
