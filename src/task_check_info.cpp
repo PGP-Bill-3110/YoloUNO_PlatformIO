@@ -12,7 +12,6 @@ void Load_info_File()
   File file = LittleFS.open("/info.dat", "r");
   if (!file)
   {
-    Serial.println("[Config] No saved config file found");
     return;
   }
   DynamicJsonDocument doc(4096);
@@ -46,13 +45,6 @@ void Save_info_File(String wifi_ssid, String wifi_pass, String CORE_IOT_TOKEN, S
   Serial.println(wifi_ssid);
   Serial.println(wifi_pass);
 
-  // Ensure LittleFS is initialized before writing
-  if (!LittleFS.begin(true))
-  {
-    Serial.println("❌ Error initializing LittleFS for save!");
-    return;
-  }
-
   DynamicJsonDocument doc(4096);
   doc["WIFI_SSID"] = wifi_ssid;
   doc["WIFI_PASS"] = wifi_pass;
@@ -65,11 +57,10 @@ void Save_info_File(String wifi_ssid, String wifi_pass, String CORE_IOT_TOKEN, S
   {
     serializeJson(doc, configFile);
     configFile.close();
-    Serial.println("✅ Configuration saved successfully!");
   }
   else
   {
-    Serial.println("❌ Unable to save the configuration.");
+    Serial.println("Unable to save the configuration.");
   }
   ESP.restart();
 };

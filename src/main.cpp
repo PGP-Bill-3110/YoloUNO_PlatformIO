@@ -49,7 +49,7 @@ void setup()
   xTaskCreate(coreiot_task, "CoreIOT Task" ,4096  ,NULL  ,2 , NULL);
   xTaskCreate(Task_Toogle_BOOT, "Task_Toogle_BOOT", 4096, NULL, 2, NULL);
   //xTaskCreate(task_uart_sender, "Task UART Sender", 2048, NULL, 2, NULL);
-  // xTaskCreate(tinyml_anomaly, "TinyML Anomaly Task", 4096, NULL, 2, NULL);
+  xTaskCreate(tinyml_anomaly, "TinyML Anomaly Task", 4096, NULL, 2, NULL);
   
   // Initialize semaphore - give it once if WiFi credentials exist
   if (!WIFI_SSID.isEmpty())

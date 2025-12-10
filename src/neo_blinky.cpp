@@ -78,28 +78,19 @@ void neo_blinky(void *pvParameters){
                 }
                 break;
             case 1:
-                for(hue=0; hue<=1; hue+=0.01){
-                    neoStrip.setPixelColor(0, rainbow(hue, 1.0, 1.0));
-                    neoStrip.show();
-                    vTaskDelay(pdMS_TO_TICKS(RAINBOW_SLOW_DELAY));
-                }
-                for(hue=1; hue>=0; hue-=0.01){
-                    neoStrip.setPixelColor(0, rainbow(hue, 1.0, 1.0));
-                    neoStrip.show();
-                    vTaskDelay(pdMS_TO_TICKS(RAINBOW_SLOW_DELAY));
-                }
+                hue += 0.01;
+                if(hue > 1) hue = 0;
+                neoStrip.setPixelColor(0, rainbow(hue, 1.0, 1.0));
+                neoStrip.show();
+                vTaskDelay(pdMS_TO_TICKS(RAINBOW_SLOW_DELAY));
                 break;
             case 2:
-                for(hue=0; hue<=1; hue+=0.01){
-                    neoStrip.setPixelColor(0, rainbow(hue, 1.0, 1.0));
-                    neoStrip.show();
-                    vTaskDelay(pdMS_TO_TICKS(RAINBOW_FAST_DELAY));
-                }
-                for(hue=1; hue>=0; hue-=0.01){
-                    neoStrip.setPixelColor(0, rainbow(hue, 1.0, 1.0));
-                    neoStrip.show();
-                    vTaskDelay(pdMS_TO_TICKS(RAINBOW_FAST_DELAY));
-                }
+                hue += 0.01;
+                if(hue > 1) hue = 0;
+                neoStrip.setPixelColor(0, rainbow(hue, 1.0, 1.0));
+                neoStrip.show();
+                vTaskDelay(pdMS_TO_TICKS(RAINBOW_FAST_DELAY));
+                break;
             default:
                 break;
         }

@@ -280,11 +280,18 @@ String settingsPage()
         e.preventDefault();
         let ssid = document.getElementById('ssid').value;
         let pass = document.getElementById('pass').value;
+        
+        // Show connecting message immediately
+        document.getElementById('msg').innerText = 'Connecting...';
+        document.getElementById('msg').style.color = '#ffffffff';
+        document.getElementById('msg').style.fontWeight = 'bold';
+        document.getElementById('msg').style.marginTop = '20px';
+        
         fetch('/connect?ssid='+encodeURIComponent(ssid)+'&pass='+encodeURIComponent(pass))
           .then(r=>r.text())
           .then(msg=>{
             document.getElementById('msg').innerText = msg;
-          });
+          })
       };
     </script>
   </body>
@@ -439,7 +446,7 @@ void handleConnect()
   // Save to file for persistence
   Save_info_File(WIFI_SSID, WIFI_PASS, CORE_IOT_TOKEN, CORE_IOT_SERVER, CORE_IOT_PORT);
 
-  server.send(200, "text/plain", "Connecting.... (ESP will restart in 2 seconds)");
+  server.send(200, "text/plain", "Connecting.... ");
 
   vTaskDelay(pdMS_TO_TICKS(2000));
   
