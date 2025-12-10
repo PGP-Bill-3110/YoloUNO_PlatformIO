@@ -8,8 +8,7 @@
 #include "fsm_ctrl.h"
 
 #include "mainserver.h"
-// #include "tinyml.h"
- #include "coreiot.h"
+#include "coreiot.h"
 
 #include "task_check_info.h"
 #include "task_toogle_boot.h"
@@ -17,7 +16,6 @@
 #include "task_webserver.h"
 #include "task_core_iot.h"
 
-#include "uart.h"
 #include "tinyml_anomaly.h"
 
 
@@ -39,16 +37,10 @@ void setup()
   xTaskCreate(getKeyButton, "Button Task", 2048, NULL, 2, NULL);
   xTaskCreate(PrintSerialTask, "Serial Task", 2048, NULL, 2, NULL);
   xTaskCreate(fsmCtrlTask, "FSM Control Task", 2048, NULL, 2, NULL);
-
-  // xTaskCreate(led_blinky, "Task LED Blink", 2048, NULL, 2, NULL);
-  // xTaskCreate(neo_blinky, "Task NEO Blink", 2048, NULL, 2, NULL);
   xTaskCreate(main_server_task, "Task Main Server" ,8192  ,NULL  ,2 , NULL);  // Priority 2
   xTaskCreate(task_wifi, "Task WIFI" ,4096  ,NULL  ,3 , NULL);  // Priority 3 = higher
-  // xTaskCreate( tiny_ml_task, "Tiny ML Task" ,2048  ,NULL  ,2 , NULL);
-  // xTaskCreate(task_wifi, "Task WiFi", 4096, NULL, 3, NULL);  // Priority 3 = higher, runs first
   xTaskCreate(coreiot_task, "CoreIOT Task" ,4096  ,NULL  ,2 , NULL);
   xTaskCreate(Task_Toogle_BOOT, "Task_Toogle_BOOT", 4096, NULL, 2, NULL);
-  //xTaskCreate(task_uart_sender, "Task UART Sender", 2048, NULL, 2, NULL);
   xTaskCreate(tinyml_anomaly, "TinyML Anomaly Task", 4096, NULL, 2, NULL);
   
   // Initialize semaphore - give it once if WiFi credentials exist
@@ -60,6 +52,4 @@ void setup()
 
 void loop()
 {
-
-  
 }

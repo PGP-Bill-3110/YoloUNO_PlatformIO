@@ -78,20 +78,33 @@ void tinyml_anomaly(void* pvParameters) {
 
             // Update global neoStrip safely
             if (neoMutex && xSemaphoreTake(neoMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
-                neoStrip.setPixelColor(0, anomaly ? neoStrip.Color(255,0,0)
-                                                   : neoStrip.Color(0,0,255));
+                neoStrip.setPixelColor(0, anomaly ? neoStrip.Color(255,0,0) : neoStrip.Color(0,0,255));
                 neoStrip.show();
                 xSemaphoreGive(neoMutex);
             }
 
+            static int page = 0;
+
             lcd.clear();
             lcd.setCursor(0,0);
-            lcd.print("Hu:"); lcd.print(humidity,1); lcd.print("% T:");
-            lcd.print(temperature,1); lcd.print(" C");
 
-            lcd.setCursor(0,1);
-            lcd.print("IR:"); lcd.print(ir_value,2);
-            lcd.print(" "); lcd.print(anomaly ? "Anomaly" : "Normal");
+            if (page == 0) {
+                lcd.print("Temp: "); lcd.print(temperature,1); lcd.print("C");
+                lcd.setCursor(0,1);
+                lcd.print("Humid: "); lcd.print(humidity,1); lcd.print("%");
+            } else if (page == 1) {
+                lcd.print("Humid: "); lcd.print(humidity,1); lcd.print("%");
+                lcd.setCursor(0,1);
+                lcd.print("IR:"); lcd.print(ir_value,2); lcd.print(" -> ");
+                lcd.print(anomaly ? "Anomaly" : "Normal");
+            } else if (page == 2) {
+                lcd.print("IR:"); lcd.print(ir_value,2); lcd.print(" -> ");
+                lcd.print(anomaly ? "Anomaly" : "Normal");
+                lcd.setCursor(0,1);
+                lcd.print("Temp: "); lcd.print(temperature,1); lcd.print("C");
+            }
+             
+            page = (page + 1) % 3;
 
             xSemaphoreGive(xI2CMutex);
         }

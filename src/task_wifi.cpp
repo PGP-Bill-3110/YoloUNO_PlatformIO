@@ -8,7 +8,7 @@ void startAP()
 {
     WiFi.mode(WIFI_AP);
     WiFi.softAP(String(SSID_AP), String(PASS_AP));
-    Serial.print("AP IP: ");
+    Serial.print("AP IP Address: ");
     Serial.println(WiFi.softAPIP());
 }
 
@@ -47,7 +47,7 @@ void startSTA()
     {
         Serial.println("");
         Serial.println("[WiFi] WiFi Connected!");
-        Serial.print("[WiFi] IP Address: ");
+        Serial.print("[WiFi] STA IP Address: ");
         Serial.println(WiFi.localIP());
         isWifiConnected = true;
         xSemaphoreGive(xBinarySemaphoreInternet);
